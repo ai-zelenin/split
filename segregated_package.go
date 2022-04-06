@@ -219,7 +219,7 @@ func (s *SegregatedPackage) MakePackage(dir string, flush bool) error {
 
 	for fileName, file := range s.Files {
 		fn := path.Join(dir, fmt.Sprintf("%s%s.go", fileName, s.Suffix))
-		fmt.Printf("write %s \n", fn)
+		fmt.Printf("write %s %d declarations\n", fn, len(file.Decls))
 		err := s.writeFile(fn, file)
 		if err != nil {
 			return err
