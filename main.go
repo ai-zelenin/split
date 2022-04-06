@@ -9,9 +9,9 @@ import (
 	"os"
 )
 
-var srcDir = flag.String("src", "pb", "source dir package")
+var srcDir = flag.String("src", "pb", "source file")
 var pkgName = flag.String("pkg", "pb", "dst package name")
-var dstDir = flag.String("dst", "pb_Sep", "source dir package")
+var dstDir = flag.String("dst", "pb_Sep", "dst dir")
 
 func main() {
 	flag.Parse()
@@ -20,18 +20,16 @@ func main() {
 		srcDir = &arg
 	}
 	if arg == "version" {
-		fmt.Println("0.1.0")
+		fmt.Println("0.1.1")
 		os.Exit(0)
 	}
 	sp := NewSegregatedPackage(*pkgName)
 	fset := token.NewFileSet()
-	pkgs, err := parser.ParseDir(fset, *srcDir, nil, parser.ParseComments)
+	f, err := parser.ParseFile(fset, *srcDir, nil, parser.ParseComments)
 	if err != nil {
 		panic(err)
 	}
-	for _, pkg := range pkgs {
-		ast.Walk(sp, pkg)
-	}
+	ast.Walk(sp, f)
 	err = sp.MakePackage(*dstDir)
 	if err != nil {
 		panic(err)
