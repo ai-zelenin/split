@@ -19,14 +19,16 @@ type SegregatedPackage struct {
 	Files   map[string]*ast.File
 	Decls   []*Decl
 	PkgName string
+	Suffix  string
 }
 
-func NewSegregatedPackage(pkgName string) *SegregatedPackage {
+func NewSegregatedPackage(pkgName string, suffix string) *SegregatedPackage {
 	return &SegregatedPackage{
 		Fset:    token.NewFileSet(),
 		Files:   map[string]*ast.File{},
 		PkgName: pkgName,
 		Decls:   []*Decl{},
+		Suffix:  suffix,
 	}
 }
 
@@ -144,15 +146,17 @@ func (s *SegregatedPackage) addDeclFromFD(decl *ast.FuncDecl) {
 	s.Decls = append(s.Decls, d)
 }
 
-func (s *SegregatedPackage) MakePackage(dir string) error {
-	inDir, err := filepath.Glob(fmt.Sprintf("%s/*", dir))
-	if err != nil {
-		return err
-	}
-	for _, f := range inDir {
-		_ = os.Remove(f)
-	}
+func (s *SegregatedPackage) MakePackage(dir string, flush bool) error {
+	if flush {
+		inDir, err := filepath.Glob(fmt.Sprintf("%s/*", dir))
+		if err != nil {
+			return err
+		}
 
+		for _, f := range inDir {
+			_ = os.Remove(f)
+		}
+	}
 	common := s.addFile("common")
 	for _, decl := range s.Decls {
 		if decl.Kind() == "type" {
@@ -211,7 +215,7 @@ func (s *SegregatedPackage) MakePackage(dir string) error {
 	}
 
 	for fileName, file := range s.Files {
-		fn := path.Join(dir, fmt.Sprintf("%s.go", fileName))
+		fn := path.Join(dir, fmt.Sprintf("%s%s.go", fileName, s.Suffix))
 		fmt.Printf("write %s \n", fn)
 		err := s.writeFile(fn, file)
 		if err != nil {
