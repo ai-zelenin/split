@@ -22,7 +22,7 @@ func main() {
 		srcDir = &arg
 	}
 	if arg == "version" {
-		fmt.Println("0.1.2")
+		fmt.Println("0.1.3")
 		os.Exit(0)
 	}
 	sp := NewSegregatedPackage(*pkgName, *suffix)

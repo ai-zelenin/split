@@ -181,25 +181,28 @@ func (s *SegregatedPackage) MakePackage(dir string, flush bool) error {
 				if decl.Used {
 					continue
 				}
-				hasPrefixName := strings.HasPrefix(decl.Name, fileName)
-				hasPrefixType := strings.HasPrefix(decl.VarType, fileName)
-				hasPrefixXXXName := strings.HasPrefix(decl.Name, "xxx_messageInfo_"+fileName)
-				hasPrefixNewName := strings.HasPrefix(decl.Name, "New"+fileName)
-				hasPrefixRegister := strings.HasPrefix(decl.Name, "Register"+strings.TrimSuffix(fileName, "Server"))
-				hasPrefixUnderscore := strings.HasPrefix(decl.Name, "_"+strings.TrimSuffix(fileName, "Server"))
-				hasPrefixRequest := strings.HasPrefix(decl.Name, "request_"+strings.TrimSuffix(fileName, "Server"))
-				hasPrefixLocalRequest := strings.HasPrefix(decl.Name, "local_request_"+strings.TrimSuffix(fileName, "Server"))
-				hasPrefixFilter := strings.HasPrefix(decl.Name, "filter_"+strings.TrimSuffix(fileName, "Server"))
-				hasPrefixReceiver := strings.HasPrefix(decl.receiver, fileName)
+				//hasPrefixName := strings.HasPrefix(decl.Name, fileName)
+				//hasPrefixType := strings.HasPrefix(decl.VarType, fileName)
+				//hasPrefixXXXName := strings.HasPrefix(decl.Name, "xxx_messageInfo_"+fileName)
+				//hasPrefixNewName := strings.HasPrefix(decl.Name, "New"+fileName)
+				//hasPrefixRegister := strings.HasPrefix(decl.Name, "Register"+strings.TrimSuffix(fileName, "Server"))
+				//hasPrefixUnderscore := strings.HasPrefix(decl.Name, "_"+strings.TrimSuffix(fileName, "Server"))
+				//hasPrefixRequest := strings.HasPrefix(decl.Name, "request_"+strings.TrimSuffix(fileName, "Server"))
+				//hasPrefixLocalRequest := strings.HasPrefix(decl.Name, "local_request_"+strings.TrimSuffix(fileName, "Server"))
+				//hasPrefixFilter := strings.HasPrefix(decl.Name, "filter_"+strings.TrimSuffix(fileName, "Server"))
+				//hasPrefixReceiver := strings.HasPrefix(decl.receiver, fileName)
+				nameContain := strings.Contains(strings.ToLower(decl.Name), strings.ToLower(fileName))
+				typeContain := strings.Contains(strings.ToLower(decl.VarType), strings.ToLower(fileName))
+				receiverContain := strings.Contains(strings.ToLower(decl.receiver), strings.ToLower(fileName))
 
 				switch {
-				case t == "type" && hasPrefixName:
+				case t == "type" && nameContain:
 					file.Decls = append(file.Decls, decl.Node())
 					decl.Used = true
-				case (t == "var" || t == "const") && (hasPrefixName || hasPrefixType || hasPrefixXXXName || hasPrefixUnderscore || hasPrefixFilter):
+				case (t == "var" || t == "const") && (typeContain || nameContain):
 					file.Decls = append(file.Decls, decl.Node())
 					decl.Used = true
-				case t == "func" && (hasPrefixReceiver || hasPrefixNewName || hasPrefixRegister || hasPrefixUnderscore || hasPrefixRequest || hasPrefixLocalRequest):
+				case t == "func" && (nameContain || receiverContain):
 					file.Decls = append(file.Decls, decl.Node())
 					decl.Used = true
 				}
